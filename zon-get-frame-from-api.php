@@ -1,12 +1,17 @@
 <?php
-/*
- Plugin Name: ZON Rahmen API - Framebuilder
- Description: Get and cache a preconfigured site frame from www.zeit.de/framebuilder and display it as header and footer in the blog themes.
- Version: 1.0
- Author: nico.bruenjes@zeit.de
- Author URI: http://www.zeit.de
- Text Domain: zgffa
- Domain Path: /languages/
+/**
+ * @package ZEIT ONLINE Framebuilder Client
+ *
+ * Plugin Name:       ZEIT ONLINE Framebuilder Client
+ * Plugin URI:        https://github.com/ZeitOnline/zon-get-frame-from-api
+ * Description:       Get and cache a preconfigured site frame from www.zeit.de/framebuilder and display it as header and footer in the blog themes
+ * Version:           2.0.0
+ * Author:            Nico Bruenjes, Moritz Stoltenburg, Arne Seemann
+ * Author URI:        http://www.zeit.de
+ * Text Domain:       zgffa
+ * License:           GPL-3.0+
+ * License URI:       http://www.gnu.org/licenses/gpl-3.0.txt
+ * Domain Path:       /languages
 */
 
 defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
