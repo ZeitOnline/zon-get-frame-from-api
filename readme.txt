@@ -11,4 +11,3 @@ Download and cache special header and footer html snippets from ZEIT ONLINEs Fra
 == Installation ==
 Install the plugin from the git repository using the github-updater plugin.
 
-
