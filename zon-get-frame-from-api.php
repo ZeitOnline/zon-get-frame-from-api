@@ -5,7 +5,7 @@
  * Plugin Name:       ZEIT ONLINE Framebuilder Client
  * Plugin URI:        https://github.com/ZeitOnline/zon-get-frame-from-api
  * Description:       Get and cache a preconfigured site frame from www.zeit.de/framebuilder and display it as header and footer in the blog themes
- * Version:           2.1.0
+ * Version:           2.2.0
  * Author:            Nico Bruenjes, Moritz Stoltenburg, Arne Seemann
  * Author URI:        http://www.zeit.de
  * Text Domain:       zgffa
@@ -33,6 +33,13 @@ class ZON_Get_Frame_From_API
 	 * @var string
 	 */
 	static $framebuilder_url = 'http://www.zeit.de/framebuilder';
+
+	/**
+	 * identifier name for the plugin
+	 *
+	 * @var  string
+	 */
+	static $plugin_name = 'zon_get_frame_from_api';
 
 	/**
 	 * Time in seconds to cache content
@@ -79,6 +86,9 @@ class ZON_Get_Frame_From_API
 
 		// override option zon_bannerkennung
 		add_filter( 'pre_option_zon_bannerkennung', array( $this, 'get_banner_channel' ) );
+
+		$plugin = plugin_basename( __FILE__ );
+		add_filter( "plugin_action_links_$plugin", 'plugin_add_settings_link' );
 	}
 
 	/**
@@ -118,14 +128,14 @@ class ZON_Get_Frame_From_API
 			'zgffa_general_settings',
 			__( 'Framebuilder API', 'zgffa' ),
 			array( $this, 'zgffa_settings_section_text' ),
-			'zon_frame_api'
+			self::plugin_name
 		);
 
 		add_settings_field(
 			'ttl',
 			__( 'Cachingtime in seconds', 'zgffa' ),
 			array( $this, 'zgffa_settings_ttl_render' ),
-			'zon_frame_api',
+			self::plugin_name,
 			'zgffa_general_settings'
 		);
 
@@ -133,7 +143,7 @@ class ZON_Get_Frame_From_API
 			'ssl',
 			__( 'Use SSL/TLS frame', 'zgffa' ),
 			array( $this, 'zgffa_settings_ssl_render' ),
-			'zon_frame_api',
+			self::plugin_name,
 			'zgffa_general_settings'
 		);
 
@@ -182,7 +192,7 @@ HTML;
 				__('ZEIT ONLINE Frame Pulling API', 'zgffa'), // page_title
 				__('ZON Frame API', 'zgffa'), // menu_title
 				'manage_options', // capability
-				'zon_frame_api', // menu_slug
+				self::plugin_name, // menu_slug
 				array( $this, 'options_page' ) // function
 			);
 		} else {
@@ -190,7 +200,7 @@ HTML;
 				__('ZEIT ONLINE Frame Pulling API', 'zgffa'), // page_title
 				__('ZON Frame API', 'zgffa'), // menu_title
 				'manage_options', // capability
-				'zon_frame_api', // menu_slug
+				self::plugin_name, // menu_slug
 				array( $this, 'options_page' ) // function
 			);
 		}
@@ -260,7 +270,7 @@ HTML;
 			<form method="POST">
 				<?php
 				settings_fields( self::PREFIX . '_group' );
-				do_settings_sections( 'zon_frame_api' );
+				do_settings_sections( self::plugin_name );
 				?>
 				<p class="submit">
 				<?php submit_button(null, 'primary', 'submit', false); ?>
@@ -604,6 +614,13 @@ HTML;
 			return delete_transient( $transient );
 		}
 	}
+
+	public function plugin_add_settings_link( $links ) {
+	    $settings_link = sprintf('<a href="options-general.php?page=%s">%s</a>', self::plugin_name, __( 'Settings' ) );
+	    array_push( $links, $settings_link );
+	  	return $links;
+	}
+
 }
 
 register_activation_hook(__FILE__, array('ZON_Get_Frame_From_API', 'activate'));
