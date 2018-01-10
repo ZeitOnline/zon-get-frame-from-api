@@ -423,6 +423,11 @@ HTML;
 			$params['banner_channel'] = $this->get_banner_channel();
 		}
 
+		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+		if ( ! is_plugin_active( 'z_auth/z_auth.php' ) ) {
+			$params['loginstatus_enforced'] = 1;
+		}
+
 		return $params;
 	}
 
