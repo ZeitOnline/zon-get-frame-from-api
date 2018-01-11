@@ -5,7 +5,7 @@
  * Plugin Name:       ZEIT ONLINE Framebuilder Client
  * Plugin URI:        https://github.com/ZeitOnline/zon-get-frame-from-api
  * Description:       Get and cache a preconfigured site frame from www.zeit.de/framebuilder and display it as header and footer in the blog themes
- * Version:           2.2.0
+ * Version:           2.2.1
  * Author:            Nico Bruenjes, Moritz Stoltenburg, Arne Seemann
  * Author URI:        http://www.zeit.de
  * Text Domain:       zgffa
@@ -315,37 +315,9 @@ HTML;
 			$body = $this->get_string_after_single_tag( $body, '<body>' );
 			$url = 'http://'.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
 			$sso_user_data = FALSE;
-			if ( function_exists( ' z_auth_decode_master_cookie' ) ) {
-				$sso_user_data = z_auth_decode_master_cookie();
-			}
-
 
 			if ( $is_wrapped ) {
 				$body = preg_replace( '|<header.+?</header>|is', '', $body);
-			}
-
-			if ( $sso_user_data ) {
-				// replace login, if logged in into community
-				// TODO: make this a template
-				$html = file_get_contents( plugin_dir_path( __FILE__ ) . "includes/user-login.tpl.html" );
-				$replace = array(
-					'{{url}}' => urlencode($url),
-					'{{name}}' => empty($sso_user_data->name) ? 'Angemeldet' : $sso_user_data->name
-				);
-				$html = strtr( $html, $replace );
-				$body = preg_replace( '|<!-- start::cut_mark::login -->[\s\S]*?<!-- end::cut_mark::login -->|uim', $html, $body);
-			} else {
-				// replace login link
-				// rawrConfig
-				$body = preg_replace(
-					'#= "(http:|https:)?//meine.zeit.de/(.+)\?url=' . preg_quote(urlencode(self::$framebuilder_url)) . '([^"]+)?#',
-					'= "\1//meine.zeit.de/\2?url=' . $url,
-					$body );
-				// login link
-				$body = preg_replace(
-					'#href="(http:|https:)?//meine.zeit.de/anmelden\?url=' . preg_quote(urlencode(self::$framebuilder_url)) . '([^"]+)?#',
-					'href="\1//meine.zeit.de/anmelden?url=' . urlencode( $url ) . '&entry_service=blog_sonstige',
-					$body );
 			}
 
 			print "\n<!-- ZON get frame body Start -->\n" . $body . "\n<!-- ZON get frame body End -->\n";
