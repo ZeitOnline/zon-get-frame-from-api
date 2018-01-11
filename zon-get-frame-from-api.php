@@ -5,7 +5,7 @@
  * Plugin Name:       ZEIT ONLINE Framebuilder Client
  * Plugin URI:        https://github.com/ZeitOnline/zon-get-frame-from-api
  * Description:       Get and cache a preconfigured site frame from www.zeit.de/framebuilder and display it as header and footer in the blog themes
- * Version:           2.2.2
+ * Version:           2.2.3
  * Author:            Nico Bruenjes, Moritz Stoltenburg, Arne Seemann
  * Author URI:        http://www.zeit.de
  * Text Domain:       zgffa
@@ -87,8 +87,8 @@ class ZON_Get_Frame_From_API
 		// override option zon_bannerkennung
 		add_filter( 'pre_option_zon_bannerkennung', array( $this, 'get_banner_channel' ) );
 
-		$plugin = plugin_basename( __FILE__ );
-		add_filter( "plugin_action_links_$plugin", 'plugin_add_settings_link' );
+		// add links on plugin page
+		add_filter('plugin_action_links', array( $this, 'add_action_links'), 10, 2 );
 	}
 
 	/**
@@ -587,10 +587,19 @@ HTML;
 		}
 	}
 
-	public function plugin_add_settings_link( $links ) {
-	    $settings_link = sprintf('<a href="options-general.php?page=%s">%s</a>', self::$plugin_name, __( 'Settings' ) );
-	    array_push( $links, $settings_link );
-	  	return $links;
+	/**
+	 * Add actions links on plugin page
+	 * @since 2.3.3
+	 * @param array $links
+	 * @param string $file
+	 * @return array $links
+	 */
+	public function add_action_links($links, $file) {
+		if( basename( dirname( $file ) ) == self::$plugin_name ) {
+			$url = esc_url( sprintf( 'options-general.php?page=%s', self::$plugin_name ) );
+			links[] = '<a href="'. $url .'">'. __( 'Settings', 'zgffa' ) .'</a>';
+		}
+		return $links;
 	}
 
 }
