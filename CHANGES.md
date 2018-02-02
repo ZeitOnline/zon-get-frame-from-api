@@ -1,3 +1,12 @@
+### 2.3
+- Removes search bar for SSL-conformity (form has a http-action)
+
+### 2.2
+- Release of staging version
+
+### 2.1
+- Release of dev version
+
 ### 2.0.9
 - Add CHANGES.md
 - Add readme.txt
