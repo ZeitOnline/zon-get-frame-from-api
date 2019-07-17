@@ -1,3 +1,8 @@
+### 2.4
+- Remove SSL option as it's mandatory for long now
+- Add cmp option to frame
+
+
 ### 2.3
 - Removes search bar for SSL-conformity (form has a http-action)
 
