@@ -193,7 +193,7 @@ HTML;
 		$settings = self::SETTINGS;
 		$options = $this->get_options();
 		if ( !isset($options['cmp'] ) ) {
-			$options['cmp'] = 1;
+			$options['cmp'] = 0;
 		}
 
 		?>
