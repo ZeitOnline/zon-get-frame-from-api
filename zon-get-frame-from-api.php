@@ -422,7 +422,7 @@ HTML;
 		$options = $this->get_options();
 		if( isset( $options['cmp'] ) ) {
 			$params['cmp'] = 'true';
-			$params['spPageId'] = 'staging_blog_' . $ressort;
+			$params['spPageId'] = 'blog_' . $ressort;
 		}
 
 		if ( get_option( 'zon_ads_deactivated' ) !== '1' ) {
