@@ -1,3 +1,6 @@
+### 2.5
+- Add GDPR infolayer option
+
 ### 2.4.1
 - Fix unprotected use of constant
 

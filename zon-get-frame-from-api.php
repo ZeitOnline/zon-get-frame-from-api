@@ -5,7 +5,7 @@
  * Plugin Name:       ZEIT ONLINE Framebuilder Client
  * Plugin URI:        https://github.com/ZeitOnline/zon-get-frame-from-api
  * Description:       Get and cache a preconfigured site frame from www.zeit.de/framebuilder and display it as header and footer in the blog themes
- * Version:           2.4.1
+ * Version:           2.5
  * Author:            Nico Bruenjes, Moritz Stoltenburg, Arne Seemann
  * Author URI:        http://www.zeit.de
  * Text Domain:       zgffa
@@ -169,6 +169,14 @@ class ZON_Get_Frame_From_API
 			'zgffa_general_settings'
 		);
 
+		add_settings_field(
+			'gdpr',
+			__( 'Show ZEIT GDPR Infolayer', 'zgffa' ),
+		 	array( $this, 'zgffa_settings_gdpr_render' ),
+			self::$plugin_name,
+			'zgffa_general_settings'
+		);
+
 	}
 
 	public function zgffa_settings_section_text() {
@@ -199,6 +207,19 @@ HTML;
 		?>
 			<input type="checkbox" name="<?php echo $settings; ?>[cmp]" value="1"<?php checked( 1 == $options['cmp'] ); ?> /> <?php
 			_e('CMP Code in frame active', 'zgffa');
+
+	}
+
+	public function zgffa_settings_gdpr_render() {
+		$settings = self::SETTINGS;
+		$options = $this->get_options();
+		if ( !isset($options['gdpr'] ) ) {
+			$options['gdpr'] = 0;
+		}
+
+		?>
+			<input type="checkbox" name="<?php echo $settings; ?>[gdpr]" value="1"<?php checked( 1 == $options['gdpr'] ); ?> /> <?php
+			_e('GDPR Info Layer from zeit.de imported and shown', 'zgffa');
 
 	}
 
@@ -423,6 +444,9 @@ HTML;
 		if( isset( $options['cmp'] ) ) {
 			$params['cmp'] = 'true';
 			$params['spPageId'] = 'blog_' . $ressort;
+		}
+		if( isset( $options['gdpr'] ) ) {
+			$params['gdpr_layer'] = 'true';
 		}
 
 		if ( get_option( 'zon_ads_deactivated' ) !== '1' ) {
