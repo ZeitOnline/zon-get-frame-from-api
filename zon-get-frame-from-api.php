@@ -5,7 +5,7 @@
  * Plugin Name:       ZEIT ONLINE Framebuilder Client
  * Plugin URI:        https://github.com/ZeitOnline/zon-get-frame-from-api
  * Description:       Get and cache a preconfigured site frame from www.zeit.de/framebuilder and display it as header and footer in the blog themes
- * Version:           2.3
+ * Version:           2.5
  * Author:            Nico Bruenjes, Moritz Stoltenburg, Arne Seemann
  * Author URI:        http://www.zeit.de
  * Text Domain:       zgffa
@@ -92,6 +92,15 @@ class ZON_Get_Frame_From_API
 	}
 
 	/**
+	 * Return the correct framebuilder url
+	 * @since 2.4
+	 * @return string url of the framebuilder to use
+	 */
+	public static function get_framebuilder_url() {
+		return defined('ZON_ENV_WEBSITE') ? ZON_ENV_WEBSITE.'/framebuilder' : self::$framebuilder_url;
+	}
+
+	/**
 	 * Add actions link on plugin page
 	 * @since 2.3.3
 	 * @param array $links
@@ -153,9 +162,17 @@ class ZON_Get_Frame_From_API
 		);
 
 		add_settings_field(
-			'ssl',
-			__( 'Use SSL/TLS frame', 'zgffa' ),
-			array( $this, 'zgffa_settings_ssl_render' ),
+			'cmp',
+			__( 'Use Sourcepoint CMP', 'zgffa' ),
+		 	array( $this, 'zgffa_settings_cmp_render' ),
+			self::$plugin_name,
+			'zgffa_general_settings'
+		);
+
+		add_settings_field(
+			'gdpr',
+			__( 'Show ZEIT GDPR Infolayer', 'zgffa' ),
+		 	array( $this, 'zgffa_settings_gdpr_render' ),
 			self::$plugin_name,
 			'zgffa_general_settings'
 		);
@@ -180,16 +197,29 @@ HTML;
 
 }
 
-	public function zgffa_settings_ssl_render() {
+	public function zgffa_settings_cmp_render() {
 		$settings = self::SETTINGS;
 		$options = $this->get_options();
-		if ( !isset($options['ssl'] ) ) {
-			$options['ssl'] = 0;
+		if ( !isset($options['cmp'] ) ) {
+			$options['cmp'] = 0;
 		}
 
 		?>
-			<input type="checkbox" name="<?php echo $settings; ?>[ssl]" value="1"<?php checked( 1 == $options['ssl'] ); ?> /> <?php
-			_e('SSL/TLS Frame active', 'zgffa');
+			<input type="checkbox" name="<?php echo $settings; ?>[cmp]" value="1"<?php checked( 1 == $options['cmp'] ); ?> /> <?php
+			_e('CMP Code in frame active', 'zgffa');
+
+	}
+
+	public function zgffa_settings_gdpr_render() {
+		$settings = self::SETTINGS;
+		$options = $this->get_options();
+		if ( !isset($options['gdpr'] ) ) {
+			$options['gdpr'] = 0;
+		}
+
+		?>
+			<input type="checkbox" name="<?php echo $settings; ?>[gdpr]" value="1"<?php checked( 1 == $options['gdpr'] ); ?> /> <?php
+			_e('GDPR Info Layer from zeit.de imported and shown', 'zgffa');
 
 	}
 
@@ -356,7 +386,7 @@ HTML;
 	 */
 	public function load_frame_data( $slice ) {
 		$params = $this->url_params( $slice );
-		$url = self::$framebuilder_url . "?" . http_build_query( $params );
+		$url = $this->get_framebuilder_url() . "?" . http_build_query( $params );
 		$md5 = md5( $url );
 		if ( false !== ( $content = $this->get_correct_transient( self::PREFIX . '_' . $md5 ) ) ) {
 			return $content;
@@ -411,8 +441,12 @@ HTML;
 		$params['meetrics'] = 1;
 		$params['hide_search'] = 1;
 		$options = $this->get_options();
-		if( isset( $options['ssl'] ) ) {
-			$params['useSSL'] = 'true';
+		if( isset( $options['cmp'] ) ) {
+			$params['cmp'] = 'true';
+			$params['spPageId'] = 'blog_' . $ressort;
+		}
+		if( isset( $options['gdpr'] ) ) {
+			$params['gdpr_layer'] = 'true';
 		}
 
 		if ( get_option( 'zon_ads_deactivated' ) !== '1' ) {
