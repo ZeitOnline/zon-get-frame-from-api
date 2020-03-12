@@ -267,6 +267,18 @@ HTML;
 		?>
 		<div class="wrap">
 			<h2>Einstellungen › <?php echo esc_html( get_admin_page_title() ); ?></h2>
+			<?php
+				$params = $this->url_params();
+				unset($params['page_slice']);
+				$debug = defined( 'WP_DEBUG' ) ? WP_DEBUG : false;
+				if ( WP_DEBUG && $params ):
+			?>
+				<div class="debug" style="background: rgba(0,0,0,0.125);padding: 10px 20px 20px">
+					<h3>Debug: Framebuilder URL Parameter</h3>
+					<pre><?php print_r( $params ); ?></pre>
+					<textarea cols="50" rows="1" style="width: 80%"><?php print( $this->get_framebuilder_url() . "?" . http_build_query( $params ) ); ?></textarea>
+				</div>
+			<?php endif; ?>
 			<?php settings_errors(); ?>
 			<form method="POST">
 				<?php
