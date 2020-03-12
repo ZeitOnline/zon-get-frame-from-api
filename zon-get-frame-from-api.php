@@ -161,14 +161,6 @@ class ZON_Get_Frame_From_API
 			'zgffa_general_settings'
 		);
 
-		add_settings_field(
-			'cmp',
-			__( 'Use Sourcepoint CMP', 'zgffa' ),
-		 	array( $this, 'zgffa_settings_cmp_render' ),
-			self::$plugin_name,
-			'zgffa_general_settings'
-		);
-
 	}
 
 	public function zgffa_settings_section_text() {
@@ -188,19 +180,6 @@ class ZON_Get_Frame_From_API
 HTML;
 
 }
-
-	public function zgffa_settings_cmp_render() {
-		$settings = self::SETTINGS;
-		$options = $this->get_options();
-		if ( !isset($options['cmp'] ) ) {
-			$options['cmp'] = 0;
-		}
-
-		?>
-			<input type="checkbox" name="<?php echo $settings; ?>[cmp]" value="1"<?php checked( 1 == $options['cmp'] ); ?> /> <?php
-			_e('CMP Code in frame active', 'zgffa');
-
-	}
 
 	/**
 	 * Adding the options page to the network menu
@@ -419,12 +398,6 @@ HTML;
 		$params['ivw'] = 1;
 		$params['meetrics'] = 1;
 		$params['hide_search'] = 1;
-		$options = $this->get_options();
-		if( isset( $options['cmp'] ) ) {
-			$params['cmp'] = 'true';
-			$params['spPageId'] = 'blog_' . $ressort;
-		}
-
 		if ( get_option( 'zon_ads_deactivated' ) !== '1' ) {
 			$params['banner_channel'] = $this->get_banner_channel();
 		}
