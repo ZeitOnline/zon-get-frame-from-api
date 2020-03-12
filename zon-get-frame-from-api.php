@@ -290,6 +290,12 @@ HTML;
 				<?php submit_button(__('Delete cache and reload frame from API', 'zgffa'), 'secondary', 'reload', false); ?>
 				</p>
 			</form>
+			<?php $adfree = defined('TEMP_AD_FREE') ? TEMP_AD_FREE : false;
+				if($adfree):
+			?>
+			<p><strong>Banner</strong> sind zur Zeit via <code>wp-config.php</code> <strong>ausgeschaltet.</strong></p>
+			<p>Diese Einstellung wird mglw. erst mit der nächsten Aktualisierung des Rahmens aktiv.</p>
+			<?php endif; ?>
 		</div>
 		<?php
 	}
@@ -404,13 +410,17 @@ HTML;
 	 * @return array         array of url params
 	 */
 	public function url_params( $slice='html_head' ) {
+		// To temporaly disable ads in blogs
+		// add constant 'TEMP_AD_FREE' to wp-config.php
+		// and reload the frame
+		$adfree = defined('TEMP_AD_FREE') ? TEMP_AD_FREE : false;
 		$params = array( 'page_slice' => $slice );
 		$ressort = mb_strtolower( get_option( 'zon_ressort_main' ) ?: 'blogs' );
 		$params['ressort'] = $ressort;
 		$params['ivw'] = 1;
 		$params['meetrics'] = 1;
 		$params['hide_search'] = 1;
-		if ( get_option( 'zon_ads_deactivated' ) !== '1' ) {
+		if ( get_option( 'zon_ads_deactivated' ) !== '1' && !$adfree ) {
 			$params['banner_channel'] = $this->get_banner_channel();
 		}
 
