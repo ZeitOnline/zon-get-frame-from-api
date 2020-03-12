@@ -1,3 +1,6 @@
+### 2.5.1
+- Remove GDPR infolayer option
+
 ### 2.5
 - Add GDPR infolayer option
 
