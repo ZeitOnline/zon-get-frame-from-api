@@ -100,6 +100,15 @@ class ZON_Get_Frame_From_API
 		return defined('ZON_ENV_WEBSITE') ? ZON_ENV_WEBSITE.'/framebuilder' : self::$framebuilder_url;
 	}
 
+
+	/**
+	 * return adfreeness by config
+	 * @return bool if we have ad free set
+	 */
+	static function is_adfree() {
+		return defined('TEMP_AD_FREE') ? TEMP_AD_FREE : false;
+	}
+
 	/**
 	 * Add actions link on plugin page
 	 * @since 2.3.3
@@ -290,9 +299,7 @@ HTML;
 				<?php submit_button(__('Delete cache and reload frame from API', 'zgffa'), 'secondary', 'reload', false); ?>
 				</p>
 			</form>
-			<?php $adfree = defined('TEMP_AD_FREE') ? TEMP_AD_FREE : false;
-				if($adfree):
-			?>
+			<?php if ( $this->is_adfree() ): ?>
 			<p><strong>Banner</strong> sind zur Zeit via <code>wp-config.php</code> <strong>ausgeschaltet.</strong></p>
 			<p>Diese Einstellung wird mglw. erst mit der nächsten Aktualisierung des Rahmens aktiv.</p>
 			<?php endif; ?>
@@ -413,14 +420,16 @@ HTML;
 		// To temporaly disable ads in blogs
 		// add constant 'TEMP_AD_FREE' to wp-config.php
 		// and reload the frame
-		$adfree = defined('TEMP_AD_FREE') ? TEMP_AD_FREE : false;
+		if ( $this->is_adfree() ) {
+			update_option( 'zon_ads_deactivated', '1');
+		}
 		$params = array( 'page_slice' => $slice );
 		$ressort = mb_strtolower( get_option( 'zon_ressort_main' ) ?: 'blogs' );
 		$params['ressort'] = $ressort;
 		$params['ivw'] = 1;
 		$params['meetrics'] = 1;
 		$params['hide_search'] = 1;
-		if ( get_option( 'zon_ads_deactivated' ) !== '1' && !$adfree ) {
+		if ( get_option( 'zon_ads_deactivated' ) !== '1' ) {
 			$params['banner_channel'] = $this->get_banner_channel();
 		}
 
