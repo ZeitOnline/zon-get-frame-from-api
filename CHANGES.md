@@ -1,3 +1,9 @@
+### 2.5.2
+- Fix Cookiebanner w/o Ads
+
+### 2.5.1
+- Remove GDPR infolayer option
+
 ### 2.5
 - Add GDPR infolayer option
 

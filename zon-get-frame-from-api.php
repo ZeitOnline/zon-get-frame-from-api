@@ -5,7 +5,7 @@
  * Plugin Name:       ZEIT ONLINE Framebuilder Client
  * Plugin URI:        https://github.com/ZeitOnline/zon-get-frame-from-api
  * Description:       Get and cache a preconfigured site frame from www.zeit.de/framebuilder and display it as header and footer in the blog themes
- * Version:           2.5
+ * Version:           2.5.2
  * Author:            Nico Bruenjes, Moritz Stoltenburg, Arne Seemann
  * Author URI:        http://www.zeit.de
  * Text Domain:       zgffa
@@ -100,6 +100,15 @@ class ZON_Get_Frame_From_API
 		return defined('ZON_ENV_WEBSITE') ? ZON_ENV_WEBSITE.'/framebuilder' : self::$framebuilder_url;
 	}
 
+
+	/**
+	 * return adfreeness by config
+	 * @return bool if we have ad free set
+	 */
+	static function is_adfree() {
+		return defined('TEMP_AD_FREE') ? TEMP_AD_FREE : false;
+	}
+
 	/**
 	 * Add actions link on plugin page
 	 * @since 2.3.3
@@ -161,22 +170,6 @@ class ZON_Get_Frame_From_API
 			'zgffa_general_settings'
 		);
 
-		add_settings_field(
-			'cmp',
-			__( 'Use Sourcepoint CMP', 'zgffa' ),
-		 	array( $this, 'zgffa_settings_cmp_render' ),
-			self::$plugin_name,
-			'zgffa_general_settings'
-		);
-
-		add_settings_field(
-			'gdpr',
-			__( 'Show ZEIT GDPR Infolayer', 'zgffa' ),
-		 	array( $this, 'zgffa_settings_gdpr_render' ),
-			self::$plugin_name,
-			'zgffa_general_settings'
-		);
-
 	}
 
 	public function zgffa_settings_section_text() {
@@ -196,32 +189,6 @@ class ZON_Get_Frame_From_API
 HTML;
 
 }
-
-	public function zgffa_settings_cmp_render() {
-		$settings = self::SETTINGS;
-		$options = $this->get_options();
-		if ( !isset($options['cmp'] ) ) {
-			$options['cmp'] = 0;
-		}
-
-		?>
-			<input type="checkbox" name="<?php echo $settings; ?>[cmp]" value="1"<?php checked( 1 == $options['cmp'] ); ?> /> <?php
-			_e('CMP Code in frame active', 'zgffa');
-
-	}
-
-	public function zgffa_settings_gdpr_render() {
-		$settings = self::SETTINGS;
-		$options = $this->get_options();
-		if ( !isset($options['gdpr'] ) ) {
-			$options['gdpr'] = 0;
-		}
-
-		?>
-			<input type="checkbox" name="<?php echo $settings; ?>[gdpr]" value="1"<?php checked( 1 == $options['gdpr'] ); ?> /> <?php
-			_e('GDPR Info Layer from zeit.de imported and shown', 'zgffa');
-
-	}
 
 	/**
 	 * Adding the options page to the network menu
@@ -309,6 +276,18 @@ HTML;
 		?>
 		<div class="wrap">
 			<h2>Einstellungen › <?php echo esc_html( get_admin_page_title() ); ?></h2>
+			<?php
+				$params = $this->url_params();
+				unset($params['page_slice']);
+				$debug = defined( 'WP_DEBUG' ) ? WP_DEBUG : false;
+				if ( WP_DEBUG && $params ):
+			?>
+				<div class="debug" style="background: rgba(0,0,0,0.125);padding: 10px 20px 20px">
+					<h3>Debug: Framebuilder URL Parameter</h3>
+					<pre><?php print_r( $params ); ?></pre>
+					<textarea cols="50" rows="1" style="width: 80%"><?php print( $this->get_framebuilder_url() . "?" . http_build_query( $params ) ); ?></textarea>
+				</div>
+			<?php endif; ?>
 			<?php settings_errors(); ?>
 			<form method="POST">
 				<?php
@@ -320,6 +299,10 @@ HTML;
 				<?php submit_button(__('Delete cache and reload frame from API', 'zgffa'), 'secondary', 'reload', false); ?>
 				</p>
 			</form>
+			<?php if ( $this->is_adfree() ): ?>
+			<p><strong>Banner</strong> sind zur Zeit via <code>wp-config.php</code> <strong>ausgeschaltet.</strong></p>
+			<p>Diese Einstellung wird mglw. erst mit der nächsten Aktualisierung des Rahmens aktiv.</p>
+			<?php endif; ?>
 		</div>
 		<?php
 	}
@@ -434,21 +417,18 @@ HTML;
 	 * @return array         array of url params
 	 */
 	public function url_params( $slice='html_head' ) {
+		// To temporaly disable ads in blogs
+		// add constant 'TEMP_AD_FREE' to wp-config.php
+		// and reload the frame
+		if ( $this->is_adfree() ) {
+			update_option( 'zon_ads_deactivated', '1');
+			update_option( 'zon_gdpr_activated', 0);
+		}
 		$params = array( 'page_slice' => $slice );
 		$ressort = mb_strtolower( get_option( 'zon_ressort_main' ) ?: 'blogs' );
 		$params['ressort'] = $ressort;
 		$params['ivw'] = 1;
-		$params['meetrics'] = 1;
 		$params['hide_search'] = 1;
-		$options = $this->get_options();
-		if( isset( $options['cmp'] ) ) {
-			$params['cmp'] = 'true';
-			$params['spPageId'] = 'blog_' . $ressort;
-		}
-		if( isset( $options['gdpr'] ) ) {
-			$params['gdpr_layer'] = 'true';
-		}
-
 		if ( get_option( 'zon_ads_deactivated' ) !== '1' ) {
 			$params['banner_channel'] = $this->get_banner_channel();
 		}
