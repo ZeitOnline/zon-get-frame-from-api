@@ -5,7 +5,7 @@
  * Plugin Name:       ZEIT ONLINE Framebuilder Client
  * Plugin URI:        https://github.com/ZeitOnline/zon-get-frame-from-api
  * Description:       Get and cache a preconfigured site frame from www.zeit.de/framebuilder and display it as header and footer in the blog themes
- * Version:           2.5.1
+ * Version:           2.5.2
  * Author:            Nico Bruenjes, Moritz Stoltenburg, Arne Seemann
  * Author URI:        http://www.zeit.de
  * Text Domain:       zgffa
@@ -422,12 +422,12 @@ HTML;
 		// and reload the frame
 		if ( $this->is_adfree() ) {
 			update_option( 'zon_ads_deactivated', '1');
+			update_option( 'zon_gdpr_activated', 0);
 		}
 		$params = array( 'page_slice' => $slice );
 		$ressort = mb_strtolower( get_option( 'zon_ressort_main' ) ?: 'blogs' );
 		$params['ressort'] = $ressort;
 		$params['ivw'] = 1;
-		$params['meetrics'] = 1;
 		$params['hide_search'] = 1;
 		if ( get_option( 'zon_ads_deactivated' ) !== '1' ) {
 			$params['banner_channel'] = $this->get_banner_channel();
