@@ -1,3 +1,6 @@
+## 2.6.0
+- Add pur gate
+
 ### 2.5.2
 - Fix Cookiebanner w/o Ads
 
