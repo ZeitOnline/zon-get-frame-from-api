@@ -5,7 +5,7 @@
  * Plugin Name:       ZEIT ONLINE Framebuilder Client
  * Plugin URI:        https://github.com/ZeitOnline/zon-get-frame-from-api
  * Description:       Get and cache a preconfigured site frame from www.zeit.de/framebuilder and display it as header and footer in the blog themes
- * Version:           2.5.2
+ * Version:           2.6.0
  * Author:            Nico Bruenjes, Moritz Stoltenburg, Arne Seemann
  * Author URI:        http://www.zeit.de
  * Text Domain:       zgffa
@@ -100,13 +100,12 @@ class ZON_Get_Frame_From_API
 		return defined('ZON_ENV_WEBSITE') ? ZON_ENV_WEBSITE.'/framebuilder' : self::$framebuilder_url;
 	}
 
-
 	/**
-	 * return adfreeness by config
-	 * @return bool if we have ad free set
+	 * return deactivate pur gate by config
+	 * @return bool if pur gate is deactivated
 	 */
-	static function is_adfree() {
-		return defined('TEMP_AD_FREE') ? TEMP_AD_FREE : false;
+	public static function deactivate_pur_gate() {
+		return defined('DEACTIVATE_PUR_GATE') ? DEACTIVATE_PUR_GATE : false;
 	}
 
 	/**
@@ -283,9 +282,14 @@ HTML;
 				if ( WP_DEBUG && $params ):
 			?>
 				<div class="debug" style="background: rgba(0,0,0,0.125);padding: 10px 20px 20px">
-					<h3>Debug: Framebuilder URL Parameter</h3>
+					<h3>Debug: Framebuilder URL Parameter for next pull</h3>
 					<pre><?php print_r( $params ); ?></pre>
 					<textarea cols="50" rows="1" style="width: 80%"><?php print( $this->get_framebuilder_url() . "?" . http_build_query( $params ) ); ?></textarea>
+				</div>
+			<?php endif; ?>
+			<?php if ( $this->deactivate_pur_gate() ): ?>
+				<div class="debug" style="background: rgba(0,0,0,0.125);padding: 10px 20px 20px">
+					<p>PUR deactivated by <code>wp-config.php</code>.</p>
 				</div>
 			<?php endif; ?>
 			<?php settings_errors(); ?>
@@ -299,10 +303,6 @@ HTML;
 				<?php submit_button(__('Delete cache and reload frame from API', 'zgffa'), 'secondary', 'reload', false); ?>
 				</p>
 			</form>
-			<?php if ( $this->is_adfree() ): ?>
-			<p><strong>Banner</strong> sind zur Zeit via <code>wp-config.php</code> <strong>ausgeschaltet.</strong></p>
-			<p>Diese Einstellung wird mglw. erst mit der nächsten Aktualisierung des Rahmens aktiv.</p>
-			<?php endif; ?>
 		</div>
 		<?php
 	}
@@ -417,19 +417,15 @@ HTML;
 	 * @return array         array of url params
 	 */
 	public function url_params( $slice='html_head' ) {
-		// To temporaly disable ads in blogs
-		// add constant 'TEMP_AD_FREE' to wp-config.php
-		// and reload the frame
-		if ( $this->is_adfree() ) {
-			update_option( 'zon_ads_deactivated', '1');
-			update_option( 'zon_gdpr_activated', 0);
-		}
 		$params = array( 'page_slice' => $slice );
 		$ressort = mb_strtolower( get_option( 'zon_ressort_main' ) ?: 'blogs' );
 		$params['ressort'] = $ressort;
 		$params['ivw'] = 1;
 		$params['hide_search'] = 1;
-		if ( get_option( 'zon_ads_deactivated' ) !== '1' ) {
+		if ( ! $this->deactivate_pur_gate() ) {
+			$params['pur'] = 1;
+		}
+		if ( get_option( 'zon_ads_no_ads' ) !== '1' ) {
 			$params['banner_channel'] = $this->get_banner_channel();
 		}
 
