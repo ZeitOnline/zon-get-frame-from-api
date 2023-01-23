@@ -369,7 +369,7 @@ HTML;
 	 */
 	public function load_frame_data( $slice ) {
 		$params = $this->url_params( $slice );
-		$url = $this->get_framebuilder_url() . "?" . http_build_query( $params );
+		$url = $this->get_framebuilder_url() . "?rebrushed&" . http_build_query( $params );
 		$md5 = md5( $url );
 		if ( false !== ( $content = $this->get_correct_transient( self::PREFIX . '_' . $md5 ) ) ) {
 			return $content;
