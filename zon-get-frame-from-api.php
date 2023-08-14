@@ -369,7 +369,7 @@ HTML;
 	 */
 	public function load_frame_data( $slice ) {
 		$params = $this->url_params( $slice );
-		$url = $this->get_framebuilder_url() . "?rebrushed&" . http_build_query( $params );
+		$url = $this->get_framebuilder_url() . "?" . http_build_query( $params );
 		$md5 = md5( $url );
 		if ( false !== ( $content = $this->get_correct_transient( self::PREFIX . '_' . $md5 ) ) ) {
 			return $content;
@@ -422,12 +422,14 @@ HTML;
 		$params['ressort'] = $ressort;
 		$params['ivw'] = 1;
 		$params['hide_search'] = 1;
+		$params['rebrushed'] = 1;
 		if ( ! $this->deactivate_pur_gate() ) {
 			$params['pur'] = 1;
 		}
-		if ( get_option( 'zon_ads_no_ads' ) !== '1' ) {
-			$params['banner_channel'] = $this->get_banner_channel();
-		}
+
+		// if ( get_option( 'zon_ads_no_ads' ) !== '1' && $deactivate_ads !== false ) {
+		// 	$params['banner_channel'] = $this->get_banner_channel();
+		// }
 
 		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 		if ( ! is_plugin_active( 'z_auth/z_auth.php' ) ) {

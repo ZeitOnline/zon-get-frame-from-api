@@ -1,3 +1,6 @@
+### 2.6.1
+- Remove all ads
+
 ## 2.6.0
 - Add pur gate
 
